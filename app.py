@@ -4,6 +4,11 @@ from PIL import Image
 import numpy as np
 import json
 import urllib.parse
+from audio_recorder_streamlit import audio_recorder
+import speech_recognition as sr
+from pydub import AudioSegment
+from io import BytesIO
+import tempfile
 
 # Set page title
 st.set_page_config(page_title="Farm Disease Identifier")
@@ -44,6 +49,31 @@ def predict(image):
     prediction = model.predict(image_array)
     predicted_class = np.argmax(prediction)
     return predicted_class, index_to_class[str(predicted_class)]
+
+def transcribe_audio(audio_bytes):
+    # Convert bytes to audio
+    audio_file = BytesIO(audio_bytes)
+    audio = AudioSegment.from_wav(audio_file)
+
+    # Use a temporary file for use with SpeechRecognition
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+        temp_filename = temp_file.name
+        audio.export(temp_filename, format="wav")
+
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(temp_filename) as source:
+        recorded_audio = recognizer.record(source)
+        try:
+            text = recognizer.recognize_google(recorded_audio)  # You can use other engines, like Sphinx, here
+        except sr.UnknownValueError:
+            text = "Sorry, I could not understand the audio."
+        except sr.RequestError:
+            text = "Could not request results; check your network connection."
+
+    # Remove temporary file
+    os.remove(temp_filename)
+
+    return text
 
 def display_prediction(predicted_disease_name, disease_descriptions):
     description = disease_descriptions.get(predicted_disease_name, "Description not available")
@@ -86,6 +116,17 @@ if uploaded_file is not None:
 
     # Display human-readable label and detailed description
     display_prediction(predicted_disease_name, disease_descriptions)
+
+st.title("🌱 Farm Disease Identifier & Voice Assistant 🌾")
+
+# Record audio
+audio_bytes = audio_recorder()
+if audio_bytes:
+    st.audio(audio_bytes, format="audio/wav")
+    st.write("Transcribing... 🎤")
+    transcription = transcribe_audio(audio_bytes)
+    st.subheader("Transcription:")
+    st.write(transcription)
 
 # Footer
 st.markdown("---")
