@@ -34,10 +34,15 @@ def display_prediction(predicted_disease_name, disease_descriptions):
     description = disease_descriptions.get(predicted_disease_name, "Description not available")
     st.write("Prediction:", predicted_disease_name)
     st.subheader("Description")
-    st.write(description.split("Prevention")[0])
     
-    st.subheader("Prevention")
-    st.write(description.split("Prevention")[1])
+    if "Prevention" in description:
+        description_part, prevention_description = description.split("Prevention")
+        st.write(description_part)
+        st.subheader("Prevention")
+        st.write(prevention_description)
+    else:
+        st.write(description)
+    
     st.write("If you have any concerns or need further assistance, please consult with a local agricultural expert.")
 
 def main():
