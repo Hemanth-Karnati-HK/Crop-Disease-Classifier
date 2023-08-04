@@ -40,16 +40,17 @@ def display_prediction(predicted_disease_name, disease_descriptions):
     description = disease_descriptions.get(predicted_disease_name, "Description not available")
     st.write("Prediction:", predicted_disease_name)
     st.subheader("Description")
-    st.write(description.split("Prevention")[0])
     if "Prevention" in description:
-        prevention_description = description.split("Prevention")[1]
-        st.write(prevention_description)
+        description_parts = description.split("Prevention")
+        st.write(description_parts[0])
+        st.subheader("Prevention")
+        st.write(description_parts[1])
     else:
         st.write(description)
-    st.subheader("Prevention")
-    st.write(description.split("Prevention")[1])
+
     st.write("If you have any concerns or need further assistance, please consult with a local agricultural expert.")
     translate_text(description)
+
 
 st.title("Farm Disease Identifier")
 st.write("Welcome! Upload an image of a plant, and I'll identify the disease (if any). Together, we can ensure a healthy crop!")
