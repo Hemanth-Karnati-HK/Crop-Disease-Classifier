@@ -9,6 +9,7 @@ import speech_recognition as sr
 from pydub import AudioSegment
 from io import BytesIO
 import tempfile
+import os
 
 # Set page title
 st.set_page_config(page_title="Farm Disease Identifier")
