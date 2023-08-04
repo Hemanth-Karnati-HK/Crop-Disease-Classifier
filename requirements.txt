@@ -1,4 +1,8 @@
 streamlit
 tensorflow
-PILLOW
+Pillow
 numpy
+audio-recorder-streamlit
+SpeechRecognition
+pydub
+
